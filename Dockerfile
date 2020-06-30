@@ -15,7 +15,8 @@ RUN apk --update add wget \
         libgsasl-dev \
         supervisor \
         re2c \
-        openssl
+        openssl \
+        dcron
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap
 
@@ -23,21 +24,21 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # install igbinary
 RUN cd /tmp && \
-        wget https://github.com/igbinary/igbinary/archive/3.0.1.zip && \
-        unzip 3.0.1.zip && cd igbinary-3.0.1 && \
+        wget https://github.com/igbinary/igbinary/archive/3.1.2.zip && \
+        unzip 3.1.2.zip && cd igbinary-3.1.2 && \
         phpize && ./configure && make && make install && \
         docker-php-ext-enable igbinary
 
 # install memcached
 RUN cd /tmp && \
-        wget https://github.com/php-memcached-dev/php-memcached/archive/v3.1.3.zip && \
-        unzip v3.1.3.zip && cd php-memcached-3.1.3 && \
+        wget https://github.com/php-memcached-dev/php-memcached/archive/v3.1.5.zip && \
+        unzip v3.1.5.zip && cd php-memcached-3.1.5 && \
         phpize && ./configure --enable-memcached-igbinary && make && make install && \
         docker-php-ext-enable memcached
 
 # install phpredis
 RUN cd /tmp && \
-        wget https://github.com/phpredis/phpredis/archive/5.2.0.zip && \
-        unzip 5.2.0.zip && cd phpredis-5.2.0 && \
+        wget https://github.com/phpredis/phpredis/archive/5.2.1.zip && \
+        unzip 5.2.1.zip && cd phpredis-5.2.1 && \
         phpize && ./configure --enable-redis-igbinary && make && make install && \
         docker-php-ext-enable redis
