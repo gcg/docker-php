@@ -16,9 +16,10 @@ RUN apk --update add wget \
         supervisor \
         re2c \
         openssl \
-        dcron
+        dcron \
+        libpng-dev
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap
+RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap gd
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
