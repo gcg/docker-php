@@ -11,3 +11,9 @@ Also includes composer.
 ```
 FROM guneycan/php:latest
 ```
+
+
+Specific PHP Versions
+
+For PHP7 `FROM guneycan/php:7`
+For PHP8 `FROM guneycan/php:8`
