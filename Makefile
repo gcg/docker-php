@@ -14,3 +14,6 @@ run:
 
 push:
 	docker push $(repo):$(TAG)
+
+shell:
+	docker exec -it $(repo) /bin/sh
