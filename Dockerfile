@@ -27,8 +27,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # install igbinary
 RUN cd /tmp && \
-        wget https://github.com/igbinary/igbinary/archive/3.1.2.zip && \
-        unzip 3.1.2.zip && cd igbinary-3.1.2 && \
+        wget https://github.com/igbinary/igbinary/archive/3.2.6.zip && \
+        unzip 3.2.6.zip && cd igbinary-3.2.6 && \
         phpize && ./configure && make && make install && \
         docker-php-ext-enable igbinary
 
@@ -41,7 +41,7 @@ RUN cd /tmp && \
 
 # install phpredis
 RUN cd /tmp && \
-        wget https://github.com/phpredis/phpredis/archive/5.2.1.zip && \
-        unzip 5.2.1.zip && cd phpredis-5.2.1 && \
+        wget https://github.com/phpredis/phpredis/archive/5.3.4.zip && \
+        unzip 5.3.4.zip && cd phpredis-5.3.4 && \
         phpize && ./configure --enable-redis-igbinary && make && make install && \
         docker-php-ext-enable redis
