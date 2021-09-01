@@ -19,9 +19,10 @@ RUN apk --update add wget \
         dcron \
         libpng-dev \
         libzip-dev \
-        gmp-dev
+        gmp-dev \
+        icu-dev
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap gd zip gmp bcmath
+RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap gd zip intl
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
