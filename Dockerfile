@@ -20,7 +20,8 @@ RUN apk --update add wget \
         libpng-dev \
         libzip-dev \
         gmp-dev \
-        icu-dev
+        icu-dev \
+        mysql-client
 
 RUN docker-php-ext-install mysqli pdo pdo_mysql tokenizer xml opcache soap gd zip intl
 
