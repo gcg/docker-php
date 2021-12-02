@@ -1,4 +1,6 @@
-FROM php:fpm-alpine
+FROM php:8.1-fpm-alpine
+
+LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
 RUN apk --update add wget \
         curl \
