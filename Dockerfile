@@ -25,7 +25,7 @@ RUN apk --update add wget \
         icu-dev \
         mysql-client
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath
+RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
