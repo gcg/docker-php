@@ -40,10 +40,10 @@ RUN cd /tmp && \
         docker-php-ext-enable igbinary
 
 # install memcached
-ARG MEMCACHED_VERSION=v3.2.0
+ARG MEMCACHED_VERSION=3.2.0
 RUN cd /tmp && \
-        wget https://github.com/php-memcached-dev/php-memcached/archive/${MEMCACHED_VERSION}.zip && \
-        unzip ${MEMCACHED_VERSION}.zip && cd php-memcached-${MEMCACHED_VERSION} && \
+        wget https://github.com/php-memcached-dev/php-memcached/archive/v${MEMCACHED_VERSION}.zip && \
+        unzip v${MEMCACHED_VERSION}.zip && cd php-memcached-${MEMCACHED_VERSION} && \
         phpize && ./configure --enable-memcached-igbinary && make && make install && \
         docker-php-ext-enable memcached
 
