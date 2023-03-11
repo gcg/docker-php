@@ -32,7 +32,7 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcm
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # install igbinary
-ARG IGBINARY_VERSION=3.2.12
+ARG IGBINARY_VERSION=3.2.14
 RUN cd /tmp && \
         wget https://github.com/igbinary/igbinary/archive/${IGBINARY_VERSION}.zip && \
         unzip ${IGBINARY_VERSION}.zip && cd igbinary-${IGBINARY_VERSION} && \
