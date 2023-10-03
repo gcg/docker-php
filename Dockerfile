@@ -8,7 +8,6 @@ RUN apk --update add wget \
         curl \
         git \
         grep \
-        nginx \
         build-base \
         libmemcached-dev \
         libmcrypt-dev \
@@ -17,7 +16,6 @@ RUN apk --update add wget \
         autoconf \
         cyrus-sasl-dev \
         libgsasl-dev \
-        supervisor \
         re2c \
         openssl \
         dcron \
@@ -25,9 +23,10 @@ RUN apk --update add wget \
         libzip-dev \
         gmp-dev \
         icu-dev \
-        mysql-client
+        mysql-client \
+        linux-headers
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl
+RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl sockets
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -53,4 +52,20 @@ RUN cd /tmp && \
         wget https://github.com/phpredis/phpredis/archive/${REDIS_VERSION}.zip && \
         unzip ${REDIS_VERSION}.zip && cd phpredis-${REDIS_VERSION} && \
         phpize && ./configure --enable-redis-igbinary && make && make install && \
-        docker-php-ext-enable redis
+        docker-php-ext-enable redis 
+
+
+## Should we install nginx? 
+ARG INSTALL_NGINX=true
+
+RUN if [ ${INSTALL_NGINX} = true ]; then \
+  apk --update add nginx; \
+  fi 
+
+
+## Should we install supervisord? 
+ARG INSTALL_SUPERVISOR=true
+
+RUN if [ ${INSTALL_SUPERVISOR} = true ]; then \
+  apk --update add supervisor; \
+  fi
