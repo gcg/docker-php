@@ -26,8 +26,10 @@ RUN apk --update add wget \
         mysql-client \
         linux-headers 
 
+
+RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl sockets
 RUN pecl install swoole
-RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl sockets swoole
+RUN docker-php-ext-enable swoole
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # install igbinary
