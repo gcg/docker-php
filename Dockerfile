@@ -24,9 +24,10 @@ RUN apk --update add wget \
         gmp-dev \
         icu-dev \
         mysql-client \
-        linux-headers
+        linux-headers \
+        swoole
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl sockets
+RUN docker-php-ext-install mysqli pdo pdo_mysql xml opcache soap gd zip intl bcmath pcntl sockets swoole
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
