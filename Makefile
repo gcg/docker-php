@@ -1,4 +1,4 @@
-.PHONY: build push build_81
+.PHONY: build build_83
 
 build:
 	docker buildx build \
