@@ -10,7 +10,8 @@ RUN set -ex && \
         libxml2-dev \
         libpng-dev \
         libzip-dev \
-        oniguruma-dev
+        oniguruma-dev \
+        openssl-dev
 
 ## Required PHP extensions
 RUN docker-php-ext-install pdo_mysql opcache gd zip intl bcmath pcntl sockets curl mbstring
@@ -24,5 +25,21 @@ RUN docker-php-ext-enable igbinary && docker-php-ext-enable redis
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ## Install Swoole
-RUN pecl install -D 'enable-openssl="no" enable-mysqlnd="yes" enable-swoole-sqlite="yes" enable-brotli="yes" enable-openssl="yes" enable-sockets="yes" enable-swoole-curl="yes"' swoole
-RUN docker-php-ext-enable swoole
+ARG SWOOLE_VERSION=v6.0.0
+RUN docker-php-source extract && \
+        mkdir /usr/src/php/ext/swoole && \
+        curl -sfL https://github.com/swoole/swoole-src/archive/${SWOOLE_VERSION}.tar.gz -o swoole.tar.gz && \
+        tar xfz swoole.tar.gz --strip-components=1 -C /usr/src/php/ext/swoole && \
+        docker-php-ext-configure swoole \
+        --enable-mysqlnd       \
+        --enable-swoole-pgsql  \
+        --enable-swoole-sqlite \
+        --enable-brotli        \
+        --enable-openssl       \
+        --enable-sockets --enable-swoole-curl && \
+    docker-php-ext-install -j$(nproc) swoole && \
+    rm -f swoole.tar.gz && \
+    docker-php-source delete
+
+## Clean
+RUN apk del .build-deps
