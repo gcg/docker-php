@@ -6,12 +6,16 @@ LABEL maintainer="Guney Can Gokoglu (@gcg)"
 RUN set -ex && \
         apk --update add libstdc++ libpq curl && \
         apk add --no-cache --virtual .build-deps $PHPIZE_DEPS curl-dev linux-headers brotli-dev \
-        postgresql-dev openssl-dev pcre-dev pcre2-dev sqlite-dev zlib-dev \
+        postgresql-dev openssl-dev pcre-dev pcre2-dev sqlite-dev \
+        icu-dev icu-libs zlib-dev g++ make automake autoconf libzip-dev \
+        libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev \
         libxml2-dev \
-        libpng-dev \
-        libzip-dev \
-        oniguruma-dev \
-        openssl-dev
+        gmp-dev \
+        icu-dev \
+        oniguruma-dev
+
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
+
 
 ## Required PHP extensions
 RUN docker-php-ext-install pdo_mysql opcache gd zip intl bcmath pcntl sockets curl mbstring
@@ -42,4 +46,4 @@ RUN docker-php-source extract && \
     docker-php-source delete
 
 ## Clean
-RUN apk del .build-deps
+# RUN apk del .build-deps
