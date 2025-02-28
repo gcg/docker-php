@@ -14,10 +14,8 @@ RUN set -ex && \
         icu-dev \
         oniguruma-dev
 
-RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
-
-
 ## Required PHP extensions
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install pdo_mysql opcache gd zip intl bcmath pcntl sockets curl mbstring
 
 ## IGBinary & Redis
