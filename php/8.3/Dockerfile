@@ -40,16 +40,8 @@ RUN cd /tmp && \
         phpize && ./configure && make && make install && \
         docker-php-ext-enable igbinary
 
-# install memcached
-# ARG MEMCACHED_VERSION=3.2.0
-# RUN cd /tmp && \
-#         wget https://github.com/php-memcached-dev/php-memcached/archive/v${MEMCACHED_VERSION}.zip && \
-#         unzip v${MEMCACHED_VERSION}.zip && cd php-memcached-${MEMCACHED_VERSION} && \
-#         phpize && ./configure --enable-memcached-igbinary && make && make install && \
-#         docker-php-ext-enable memcached
-
 # install phpredis
-ARG REDIS_VERSION=6.0.2
+ARG REDIS_VERSION=6.1.0
 RUN cd /tmp && \
         wget https://github.com/phpredis/phpredis/archive/${REDIS_VERSION}.zip && \
         unzip ${REDIS_VERSION}.zip && cd phpredis-${REDIS_VERSION} && \

@@ -1,10 +1,31 @@
-.PHONY: build push build_81
+.PHONY: build 83 swoole openswoole
 
-build:
-	docker buildx build --build-arg PHP_VERSION=8.3 --push --platform linux/amd64,linux/arm64/v8 -t guneycan/php:8.3 -t guneycan/php:8 -t guneycan/php:latest .
+build: openswoole swoole
 
-build_82:
-	docker buildx build --build-arg PHP_VERSION=8.2 --push --platform linux/amd64,linux/arm64/v8 -t guneycan/php:8.2 .
+openswoole:
+	docker buildx build \
+		--build-arg PHP_VERSION=8.4 \
+		--push \
+		--platform linux/amd64,linux/arm64/v8 \
+		-t guneycan/php:8.4-openswoole \
+		-t guneycan/php:8 \
+		-t guneycan/php:latest \
+		-t guneycan/php:openswoole \
+		-t guneycan/php:8-openswoole \
+		./php/8.4/openswoole/
 
-build_81:
-	docker buildx build --build-arg PHP_VERSION=8.1 --push --platform linux/amd64,linux/arm64/v8 -t guneycan/php:8.1 .
+swoole:
+	docker buildx build \
+		--build-arg PHP_VERSION=8.4 \
+		--push \
+		--platform linux/amd64,linux/arm64/v8 \
+		-t guneycan/php:8.4-swoole \
+		-t guneycan/php:8-swoole \
+		-t guneycan/php:swoole \
+		./php/8.4/swoole/
+
+83:
+	docker buildx build --build-arg PHP_VERSION=8.3 \
+	--push --platform linux/amd64,linux/arm64/v8 \
+	-t guneycan/php:8.3 ./php/8.3/
+
