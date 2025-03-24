@@ -1,6 +1,6 @@
 .PHONY: build build_83 build_84_swoole build_84_openswoole
 
-build: build_84_swoole
+build: build_84_swoole build_84_openswoole
 
 build_84_swoole:
 	docker buildx build \
