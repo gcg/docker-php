@@ -17,6 +17,7 @@ build_84_openswoole:
 		--push \
 		--platform linux/amd64,linux/arm64/v8 \
 		-t guneycan/php:8.4-openswoole \
+		-t guneycan/php:8.4 \
 		./php/8.4/openswoole/
 
 
