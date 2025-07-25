@@ -18,6 +18,10 @@ RUN set -ex && \
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install pdo_mysql pdo_pgsql opcache gd zip intl bcmath pcntl sockets curl mbstring
 
+## APCu for storing Prometheus metrics and other in-pod memory caches
+RUN pecl install apcu
+RUN docker-php-ext-enable apcu
+
 ## IGBinary & Redis
 RUN pecl install igbinary
 RUN pecl install --configureoptions 'enable-redis-igbinary="yes"' redis
