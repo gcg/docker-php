@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.4
+ARG PHP_VERSION=8.5
 FROM php:${PHP_VERSION}-cli-alpine
 LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
@@ -16,7 +16,7 @@ RUN set -ex && \
 
 ## Required PHP extensions
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install pdo_mysql pdo_pgsql opcache gd zip intl bcmath pcntl sockets curl mbstring
+RUN docker-php-ext-install pdo_mysql pdo_pgsql gd zip intl bcmath pcntl sockets curl mbstring
 
 ## APCu for storing Prometheus metrics and other in-pod memory caches
 RUN pecl install apcu
@@ -31,21 +31,30 @@ RUN docker-php-ext-enable igbinary && docker-php-ext-enable redis
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ## Install Swoole
-ARG SWOOLE_VERSION=v6.0.0
-RUN docker-php-source extract && \
-        mkdir /usr/src/php/ext/swoole && \
-        curl -sfL https://github.com/swoole/swoole-src/archive/${SWOOLE_VERSION}.tar.gz -o swoole.tar.gz && \
-        tar xfz swoole.tar.gz --strip-components=1 -C /usr/src/php/ext/swoole && \
-        docker-php-ext-configure swoole \
-        --enable-mysqlnd       \
-        --enable-swoole-pgsql  \
-        --enable-swoole-sqlite \
-        --enable-brotli        \
-        --enable-openssl       \
-        --enable-sockets --enable-swoole-curl && \
-    docker-php-ext-install -j$(nproc) swoole && \
-    rm -f swoole.tar.gz && \
-    docker-php-source delete
+ARG SWOOLE_VERSION=v6.1.4
+RUN docker-php-source extract
+RUN mkdir /usr/src/php/ext/swoole
+RUN curl -sfL https://github.com/swoole/swoole-src/archive/${SWOOLE_VERSION}.tar.gz -o swoole.tar.gz
+RUN tar xfz swoole.tar.gz --strip-components=1 -C /usr/src/php/ext/swoole
+RUN docker-php-ext-configure swoole
+RUN docker-php-ext-install -j$(nproc) swoole
+RUN rm -f swoole.tar.gz
+RUN docker-php-source delete
+
+# RUN docker-php-source extract && \
+#         mkdir /usr/src/php/ext/swoole && \
+#         curl -sfL https://github.com/swoole/swoole-src/archive/${SWOOLE_VERSION}.tar.gz -o swoole.tar.gz && \
+#         tar xfz swoole.tar.gz --strip-components=1 -C /usr/src/php/ext/swoole && \
+#         docker-php-ext-configure swoole \
+#         --enable-mysqlnd       \
+#         --enable-swoole-pgsql  \
+#         --enable-swoole-sqlite \
+#         --enable-brotli        \
+#         --enable-openssl       \
+#         --enable-sockets --enable-swoole-curl && \
+#     docker-php-ext-install -j$(nproc) swoole && \
+#     rm -f swoole.tar.gz && \
+#     docker-php-source delete
 
 ## Clean
 # RUN apk del .build-deps
