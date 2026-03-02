@@ -28,7 +28,7 @@ RUN pecl install --configureoptions 'enable-redis-igbinary="yes"' redis
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable redis
 
 ## Install OpenSwoole
-RUN pecl install openswoole-25.2.0
+RUN pecl install openswoole-26.2.0
 RUN docker-php-ext-enable openswoole
 
 ## Install Composer
