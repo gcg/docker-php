@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.4
+ARG PHP_VERSION=8.5
 FROM php:${PHP_VERSION}-cli-alpine
 LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
@@ -16,7 +16,7 @@ RUN set -ex && \
 
 ## Required PHP extensions
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install pdo_mysql pdo_pgsql opcache gd zip intl bcmath pcntl sockets curl mbstring
+RUN docker-php-ext-install pdo_mysql pdo_pgsql gd zip intl bcmath pcntl sockets curl mbstring
 
 ## APCu for storing Prometheus metrics and other in-pod memory caches
 RUN pecl install apcu
@@ -28,7 +28,7 @@ RUN pecl install --configureoptions 'enable-redis-igbinary="yes"' redis
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable redis
 
 ## Install OpenSwoole
-RUN pecl install openswoole-25.2.0
+RUN pecl install openswoole-26.2.0
 RUN docker-php-ext-enable openswoole
 
 ## Install Composer
