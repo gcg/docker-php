@@ -6,9 +6,10 @@ openswoole:
 	docker buildx build \
 		--build-arg PHP_VERSION=8.5 \
 		--push \
+		--provenance=false \
 		--platform linux/amd64,linux/arm64/v8 \
 		-t guneycan/php:8.5-openswoole \
-		-t europe-west1-docker.pkg.dev/poltio-164412/php:8.5-openswoole \
+		-t europe-west1-docker.pkg.dev/poltio-164412/php/php:8.5-openswoole \
 		./php/8.5/openswoole/
 
 swoole:
