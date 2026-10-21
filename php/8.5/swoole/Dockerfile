@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.5.12
 FROM php:${PHP_VERSION}-cli-alpine
 LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
