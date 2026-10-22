@@ -5,8 +5,8 @@ ROLE="${CONTAINER_ROLE:-${APP_ENV:-web}}"
 
 echo "Starting container with role: ${ROLE}"
 
-# Optional pre-run cache commands for production
-if [ "${RUN_OPTIMIZATIONS:-false}" = "true" ] || [ "${APP_ENV}" = "production" ]; then
+# Optional pre-run cache commands for production (opt-in via RUN_OPTIMIZATIONS=true)
+if [ "${RUN_OPTIMIZATIONS:-false}" = "true" ]; then
     echo "Warming Laravel caches..."
     php /var/www/html/artisan config:cache || true
     php /var/www/html/artisan route:cache || true

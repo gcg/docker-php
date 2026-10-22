@@ -52,7 +52,7 @@ The `docker/entry.sh` script dynamically switches roles using the `CONTAINER_ROL
 You can tune Octane via environment variables:
 
 - `PORT`: Listen port (default: `8080`)
-- `OCTANE_WORKERS`: Number of worker processes (default: `auto`, matching CPU cores)
+- `OCTANE_WORKERS`: Number of worker processes (default: `auto`, matching CPU cores). *Note for Cloud Run / ECS*: In containers allocated fractional vCPUs (e.g., 0.5 or 1 vCPU), set this explicitly to `1` or `2` since `auto` detects the host machine's total cores.
 - `OCTANE_TASK_WORKERS`: Number of task worker processes (default: `auto`)
 - `OCTANE_MAX_REQUESTS`: Max requests per worker before recycling to prevent memory leaks (default: `500`)
 - `RUN_OPTIMIZATIONS`: Set to `true` to execute `artisan config:cache`, `route:cache`, `view:cache`, and `event:cache` on startup
