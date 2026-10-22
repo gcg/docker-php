@@ -1,44 +1,52 @@
-.PHONY: build 83 84 swoole openswoole
+PHP_VERSION ?= 8.5
+SWOOLE_VERSION ?= v6.1.4
+PLATFORMS ?= linux/amd64,linux/arm64/v8
+IMAGE_PREFIX ?= guneycan/php
+GAR_PREFIX ?= europe-west1-docker.pkg.dev/poltio-164412/php/php
 
-build: openswoole swoole
+.PHONY: all build openswoole swoole fpm help
+
+build: openswoole swoole fpm
+
+all: build
 
 openswoole:
 	docker buildx build --pull \
-		--build-arg PHP_VERSION=8.5.12 \
+		--build-arg PHP_VERSION=$(PHP_VERSION) \
 		--push \
 		--provenance=false \
-		--platform linux/amd64,linux/arm64/v8 \
-		-t guneycan/php:8.5-openswoole \
-		-t europe-west1-docker.pkg.dev/poltio-164412/php/php:8.5-openswoole \
+		--platform $(PLATFORMS) \
+		-t $(IMAGE_PREFIX):8.5-openswoole \
+		-t $(IMAGE_PREFIX):openswoole \
+		-t $(IMAGE_PREFIX):latest \
+		-t $(GAR_PREFIX):8.5-openswoole \
 		./php/8.5/openswoole/
 
 swoole:
 	docker buildx build --pull \
-		--build-arg PHP_VERSION=8.5.12 \
-		--build-arg SWOOLE_VERSION=v6.1.4\
+		--build-arg PHP_VERSION=$(PHP_VERSION) \
+		--build-arg SWOOLE_VERSION=$(SWOOLE_VERSION) \
 		--push \
-		--platform linux/amd64,linux/arm64/v8 \
-		-t guneycan/php:8.5-swoole \
+		--provenance=false \
+		--platform $(PLATFORMS) \
+		-t $(IMAGE_PREFIX):8.5-swoole \
+		-t $(IMAGE_PREFIX):swoole \
 		./php/8.5/swoole/
 
-openswoole_84:
+fpm:
 	docker buildx build --pull \
-		--build-arg PHP_VERSION=8.4.27 \
+		--build-arg PHP_VERSION=$(PHP_VERSION) \
 		--push \
-		--platform linux/amd64,linux/arm64/v8 \
-		-t guneycan/php:8.4-openswoole \
-		./php/8.4/openswoole/
+		--provenance=false \
+		--platform $(PLATFORMS) \
+		-t $(IMAGE_PREFIX):8.5-fpm \
+		-t $(IMAGE_PREFIX):fpm \
+		-t $(IMAGE_PREFIX):8.5 \
+		./php/8.5/fpm/
 
-swoole_84:
-	docker buildx build --pull \
-		--build-arg PHP_VERSION=8.4.27 \
-		--push \
-		--platform linux/amd64,linux/arm64/v8 \
-		-t guneycan/php:8.4-swoole \
-		./php/8.4/swoole/
-
-83:
-	docker buildx build --pull --build-arg PHP_VERSION=8.3.36 \
-	--push --platform linux/amd64,linux/arm64/v8 \
-	-t guneycan/php:8.3 ./php/8.3/
-
+help:
+	@echo "Available make targets:"
+	@echo "  make build       - Build and push openswoole, swoole, and fpm images"
+	@echo "  make openswoole  - Build and push PHP 8.5 OpenSwoole image"
+	@echo "  make swoole      - Build and push PHP 8.5 Swoole image"
+	@echo "  make fpm         - Build and push PHP 8.5 FPM image"

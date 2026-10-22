@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.5.12
+ARG PHP_VERSION=8.5
 FROM php:${PHP_VERSION}-cli-alpine
 LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
@@ -11,29 +11,28 @@ RUN set -ex && \
         libpng-dev libwebp-dev libjpeg-turbo-dev freetype-dev \
         libxml2-dev \
         gmp-dev \
-        icu-dev \
         oniguruma-dev
 
 ## Required PHP extensions
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install pdo_mysql pdo_pgsql gd zip intl bcmath pcntl sockets curl mbstring
+RUN docker-php-ext-install -j$(nproc) pdo_mysql pdo_pgsql opcache gd zip intl bcmath pcntl sockets curl mbstring
 
 ## APCu for storing Prometheus metrics and other in-pod memory caches
-RUN pecl install apcu
-RUN docker-php-ext-enable apcu
+RUN pecl install apcu && docker-php-ext-enable apcu
 
 ## IGBinary & Redis
-RUN pecl install igbinary
-RUN pecl install --configureoptions 'enable-redis-igbinary="yes"' redis
-RUN docker-php-ext-enable igbinary && docker-php-ext-enable redis
+RUN pecl install igbinary && \
+    pecl install --configureoptions 'enable-redis-igbinary="yes"' redis && \
+    docker-php-ext-enable igbinary redis
 
 ## Install OpenSwoole
-RUN pecl install openswoole-26.2.0
-RUN docker-php-ext-enable openswoole
+RUN pecl install openswoole-26.2.0 && docker-php-ext-enable openswoole
+
+## Clean PECL temporary files
+RUN rm -rf /tmp/pear ~/.pearrc
 
 ## Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-
-## Clean
-# RUN apk del .build-deps
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["php", "-a"]
