@@ -37,13 +37,14 @@ Copy these files into your Laravel project root:
 
 ## Container Roles
 
-The `docker/entry.sh` script dynamically switches roles using the `CONTAINER_ROLE` or `APP_ENV` environment variables:
+The `docker/entry.sh` script dynamically switches roles using CLI arguments, `CONTAINER_ROLE`, or `APP_ENV`:
 
-| `CONTAINER_ROLE` | Description | Command Executed |
+| Role | Trigger | Command Executed |
 |---|---|---|
-| `web` (default) | Runs Octane HTTP server | `php artisan octane:start --server=openswoole --port=8080 ...` |
-| `worker` or `queue` | Runs Queue Worker | `php artisan queue:work --tries=3 --timeout=90` |
-| `scheduler` | Runs Laravel Schedule daemon | `php artisan schedule:work --no-interaction` |
+| `web` (default) | Default or `CONTAINER_ROLE=web` | `php artisan octane:start --server=openswoole --port=8080 ...` |
+| `worker` | `CONTAINER_ROLE=worker` or `APP_ENV=worker` | `php artisan horizon` (if installed) or `php artisan queue:work` |
+| `scheduler` | `CONTAINER_ROLE=scheduler` or `APP_ENV=scheduler` | Alpine `crond` invoking `schedule:run` every minute |
+| *Custom Command* | e.g. `docker run app php artisan migrate` | Executes custom command directly (`exec "$@"`) |
 
 ---
 

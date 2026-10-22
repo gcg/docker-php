@@ -15,10 +15,12 @@ RUN set -ex && \
 
 ## Required PHP extensions
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp
-RUN docker-php-ext-install -j$(nproc) pdo_mysql pdo_pgsql opcache gd zip intl bcmath pcntl sockets curl mbstring
+RUN docker-php-ext-install -j$(nproc) pdo_mysql pdo_pgsql pdo_sqlite opcache gd zip intl bcmath pcntl sockets curl mbstring
 
 ## APCu for storing Prometheus metrics and other in-pod memory caches
-RUN pecl install apcu && docker-php-ext-enable apcu
+RUN pecl install apcu && \
+    docker-php-ext-enable apcu && \
+    echo "apc.enable_cli = 1" >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
 
 ## IGBinary & Redis
 RUN pecl install igbinary && \

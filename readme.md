@@ -117,8 +117,11 @@ CMD ["php-fpm", "-F"]
 All images are built with `docker buildx` to ensure multi-platform compatibility and fresh base pulls:
 
 ```bash
-# Build all images (OpenSwoole, Swoole, FPM)
+# Build all images (OpenSwoole, Swoole, FPM) and push
 make build
+
+# Build locally without pushing
+make build PUSH=false
 
 # Build specific variants
 make openswoole
