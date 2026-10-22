@@ -36,4 +36,3 @@ ENV PORT=8080
 EXPOSE ${PORT}
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entry.sh"]
-CMD ["web"]

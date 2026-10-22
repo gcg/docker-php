@@ -16,8 +16,10 @@ Install Laravel Octane in your Laravel project:
 
 ```bash
 composer require laravel/octane
-php artisan octane:install --server=openswoole
+php artisan octane:install --server=swoole
 ```
+
+Octane drives OpenSwoole through its `swoole` server, so `swoole` is the correct value even though the image ships OpenSwoole.
 
 ---
 
@@ -26,6 +28,7 @@ php artisan octane:install --server=openswoole
 Copy these files into your Laravel project root:
 
 ```text
+├── .dockerignore
 ├── Dockerfile
 ├── docker-compose.yml
 └── docker/
@@ -41,7 +44,7 @@ The `docker/entry.sh` script dynamically switches roles using CLI arguments, `CO
 
 | Role | Trigger | Command Executed |
 |---|---|---|
-| `web` (default) | Default or `CONTAINER_ROLE=web` | `php artisan octane:start --server=openswoole --port=8080 ...` |
+| `web` (default) | Default or `CONTAINER_ROLE=web` | `php artisan octane:start --server=swoole --port=8080 ...` |
 | `worker` | `CONTAINER_ROLE=worker` or `APP_ENV=worker` | `php artisan horizon` (if installed) or `php artisan queue:work` |
 | `scheduler` | `CONTAINER_ROLE=scheduler` or `APP_ENV=scheduler` | Alpine `crond` invoking `schedule:run` every minute |
 | *Custom Command* | e.g. `docker run app php artisan migrate` | Executes custom command directly (`exec "$@"`) |
@@ -53,10 +56,10 @@ The `docker/entry.sh` script dynamically switches roles using CLI arguments, `CO
 You can tune Octane via environment variables:
 
 - `PORT`: Listen port (default: `8080`)
-- `OCTANE_WORKERS`: Number of worker processes (default: `auto`, matching CPU cores). *Note for Cloud Run / ECS*: In containers allocated fractional vCPUs (e.g., 0.5 or 1 vCPU), set this explicitly to `1` or `2` since `auto` detects the host machine's total cores.
-- `OCTANE_TASK_WORKERS`: Number of task worker processes (default: `auto`)
-- `OCTANE_MAX_REQUESTS`: Max requests per worker before recycling to prevent memory leaks (default: `500`)
-- `RUN_OPTIMIZATIONS`: Set to `true` to execute `artisan config:cache`, `route:cache`, `view:cache`, and `event:cache` on startup
+- `OCTANE_WORKERS`: Number of worker processes (default: `4`). Size it to the container's CPU limit; Octane's `auto` counts the host's cores, not the container's quota.
+- `OCTANE_TASK_WORKERS`: Number of task worker processes (default: `2`)
+- `OCTANE_MAX_REQUESTS`: Max requests per worker before recycling to prevent memory leaks (default: `250`)
+- `RUN_OPTIMIZATIONS`: Runs `artisan optimize` (config, route, view and event caches) on startup and fails the container if it errors (default: `true`; the compose file sets `false` because source is live-mounted)
 
 ---
 

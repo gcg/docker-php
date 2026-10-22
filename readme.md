@@ -18,7 +18,7 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 | Tag | Base | Description | Best For |
 |---|---|---|---|
 | `guneycan/php:8.5-openswoole`<br>`guneycan/php:openswoole`<br>`guneycan/php:latest` | `cli-alpine` | PHP 8.5 CLI + OpenSwoole 26.2 + Redis + APCu + Composer + Tini | **Laravel Octane**, async microservices, WebSocket servers |
-| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.1 + Redis + APCu + Composer + Tini | Swoole-based runtimes, Hyperf, Mezzio |
+| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.2 + Redis + APCu + Composer + Tini | Swoole-based runtimes, Hyperf, Mezzio |
 | `guneycan/php:8.5-fpm`<br>`guneycan/php:fpm`<br>`guneycan/php:8.5` | `fpm-alpine` | PHP 8.5 FPM + Nginx + Supervisord + Redis + APCu + Composer + Tini | Classic **Laravel / Symfony** web apps, single-container Cloud Run |
 
 ---
@@ -46,7 +46,7 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 | `redis` | PECL | High-performance client compiled with `igbinary` serializer support |
 | `igbinary` | PECL | Drop-in replacement for standard PHP serializer, saving space and CPU |
 | `apcu` | PECL | In-memory key-value store across worker processes (great for Prometheus) |
-| `opcache` | Core | Zend OPcache bytecode optimizer |
+| `opcache` | Core | Zend OPcache bytecode optimizer (always built in since PHP 8.5) |
 | `pdo_mysql` | Core | PDO MySQL driver |
 | `pdo_pgsql` | Core | PDO PostgreSQL driver |
 | `gd` | Core | Configured with `--with-freetype`, `--with-jpeg`, `--with-webp` |
@@ -93,7 +93,7 @@ RUN composer install --no-dev --optimize-autoloader
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["php", "artisan", "octane:start", "--server=openswoole", "--host=0.0.0.0", "--port=8080"]
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
 ```
 
 ### 2. Run PHP-FPM Backend
@@ -120,7 +120,7 @@ All images are built with `docker buildx` to ensure multi-platform compatibility
 # Build all images (OpenSwoole, Swoole, FPM) and push
 make build
 
-# Build locally without pushing
+# Build locally without pushing (native architecture only)
 make build PUSH=false
 
 # Build specific variants
@@ -133,7 +133,7 @@ make fpm
 
 ## Security & Maintenance
 
-Base images use floating minor tags (`php:8.5-cli-alpine` / `php:8.5-fpm-alpine`) combined with Docker buildx `--pull` to ensure every build automatically incorporates the latest upstream patch releases and security CVE fixes.
+The upstream PHP patch release is pinned via `PHP_VERSION` in the `Makefile` (and the matching `ARG` default in each Dockerfile), so builds are reproducible and never fall below a release with known CVE fixes. Bump it when a new patch lands: `make build PHP_VERSION=8.5.13`.
 
 ---
 

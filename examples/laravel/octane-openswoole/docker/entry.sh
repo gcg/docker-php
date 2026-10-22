@@ -1,10 +1,11 @@
 #!/usr/bin/env sh
 set -e
 
-# If user provided a custom CLI command (e.g. "php artisan migrate" or "sh"), execute it directly
-if [ $# -gt 0 ] && [ "$1" != "web" ] && [ "$1" != "app" ] && [ "$1" != "worker" ] && [ "$1" != "worker-dsc" ] && [ "$1" != "queue" ] && [ "$1" != "scheduler" ]; then
-    exec "$@"
-fi
+# Anything that isn't a role (e.g. "php artisan migrate" or "sh") is executed directly
+case "${1:-}" in
+    ""|web|app|worker|worker-dsc|queue|scheduler) ;;
+    *) exec "$@" ;;
+esac
 
 # Determine container role: precedence is $1 -> $CONTAINER_ROLE -> $APP_ENV mapping -> default "web"
 ROLE="${1:-${CONTAINER_ROLE}}"
@@ -17,8 +18,9 @@ if [ -z "${ROLE}" ]; then
 fi
 
 PORT="${PORT:-8080}"
-OCTANE_WORKERS="${OCTANE_WORKERS:-auto}"
-OCTANE_TASK_WORKERS="${OCTANE_TASK_WORKERS:-auto}"
+# Pinned rather than "auto": swoole counts the host's cores and ignores the container's CPU limit
+OCTANE_WORKERS="${OCTANE_WORKERS:-4}"
+OCTANE_TASK_WORKERS="${OCTANE_TASK_WORKERS:-2}"
 OCTANE_MAX_REQUESTS="${OCTANE_MAX_REQUESTS:-250}"
 
 php=/usr/local/bin/php
@@ -31,17 +33,18 @@ if [ -n "${VERSION}" ] && [ -f "${artisan}" ]; then
     $php $artisan version:set "${VERSION}" 2>/dev/null || true
 fi
 
-# Optional pre-run cache optimizations (opt-in via RUN_OPTIMIZATIONS=true)
-if [ "${RUN_OPTIMIZATIONS:-false}" = "true" ] && [ -f "${artisan}" ]; then
+# Cache config, routes, views and events (disable with RUN_OPTIMIZATIONS=false for live-mounted source)
+if [ "${RUN_OPTIMIZATIONS:-true}" = "true" ] && [ -f "${artisan}" ]; then
     echo "Optimizing Laravel (config, routes, views, events)..."
-    $php $artisan optimize || true
+    $php $artisan optimize
 fi
 
 case "${ROLE}" in
     web|app)
+        # OpenSwoole runs through Octane's "swoole" driver
         echo "Launching Laravel Octane (OpenSwoole) on port ${PORT}..."
         exec $php $artisan octane:start \
-            --server=openswoole \
+            --server=swoole \
             --host=0.0.0.0 \
             --port="${PORT}" \
             --workers="${OCTANE_WORKERS}" \
@@ -68,6 +71,7 @@ case "${ROLE}" in
         exec crond -l 2 -f
         ;;
     *)
-        exec "$@"
+        echo "Unknown CONTAINER_ROLE: ${ROLE}" >&2
+        exit 1
         ;;
 esac

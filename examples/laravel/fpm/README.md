@@ -16,6 +16,7 @@ This example demonstrates how to run a production-ready [Laravel](https://larave
 Copy these files into your Laravel project root:
 
 ```text
+├── .dockerignore
 ├── Dockerfile
 ├── docker-compose.yml
 └── docker/
@@ -39,6 +40,8 @@ The `docker/entry.sh` script dynamically switches roles using CLI arguments, `CO
 | `worker` | `CONTAINER_ROLE=worker` or `APP_ENV=worker` | `php artisan horizon` (if installed) or `php artisan queue:work` |
 | `scheduler` | `CONTAINER_ROLE=scheduler` or `APP_ENV=scheduler` | Alpine `crond` invoking `schedule:run` every minute |
 | *Custom Command* | e.g. `docker run app php artisan migrate` | Executes custom command directly (`exec "$@"`) |
+
+Before starting a role, `artisan optimize` caches config, routes, views and events and fails the container if it errors. Set `RUN_OPTIMIZATIONS=false` to skip it (the compose file does, because source is live-mounted).
 
 ---
 
