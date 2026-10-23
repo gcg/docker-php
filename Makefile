@@ -10,9 +10,9 @@ BUILD = docker buildx build --pull --provenance=false \
 	--build-arg PHP_VERSION=$(PHP_VERSION) \
 	$(if $(filter true,$(PUSH)),--push --platform $(PLATFORMS),--load)
 
-.PHONY: all build openswoole swoole fpm help
+.PHONY: all build openswoole swoole help
 
-build: openswoole swoole fpm
+build: openswoole swoole
 
 all: build
 
@@ -32,17 +32,8 @@ swoole:
 		-t $(GAR_PREFIX):$(PHP_MINOR)-swoole \
 		./php/$(PHP_MINOR)/swoole/
 
-fpm:
-	$(BUILD) \
-		-t $(IMAGE_PREFIX):$(PHP_MINOR)-fpm \
-		-t $(IMAGE_PREFIX):fpm \
-		-t $(IMAGE_PREFIX):$(PHP_MINOR) \
-		-t $(GAR_PREFIX):$(PHP_MINOR)-fpm \
-		./php/$(PHP_MINOR)/fpm/
-
 help:
 	@echo "Available make targets:"
-	@echo "  make build           - Build and push openswoole, swoole, and fpm images (PUSH=false loads native-arch locally)"
+	@echo "  make build           - Build and push openswoole and swoole images (PUSH=false loads native-arch locally)"
 	@echo "  make openswoole      - Build PHP $(PHP_MINOR) OpenSwoole image"
 	@echo "  make swoole          - Build PHP $(PHP_MINOR) Swoole image"
-	@echo "  make fpm             - Build PHP $(PHP_MINOR) FPM image"

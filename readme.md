@@ -18,8 +18,7 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 | Tag | Base | Description | Best For |
 |---|---|---|---|
 | `guneycan/php:8.5-openswoole`<br>`guneycan/php:openswoole`<br>`guneycan/php:latest` | `cli-alpine` | PHP 8.5 CLI + OpenSwoole 26.2 + Redis + APCu + Composer + Tini | **Laravel Octane**, async microservices, WebSocket servers |
-| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.2 + Redis + APCu + Composer + Tini | Swoole-based runtimes, Hyperf, Mezzio |
-| `guneycan/php:8.5-fpm`<br>`guneycan/php:fpm`<br>`guneycan/php:8.5` | `fpm-alpine` | PHP 8.5 FPM + Nginx + Supervisord + Redis + APCu + Composer + Tini | Classic **Laravel / Symfony** web apps, single-container Cloud Run |
+| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.2 + Redis + APCu + Composer + Tini | Fallback for Octane when OpenSwoole lags behind a PHP release; Hyperf, Mezzio |
 
 ---
 
@@ -60,27 +59,20 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 
 ---
 
-## Production Examples for Laravel
+## Production Example for Laravel
 
-Complete, copy-pasteable production configurations are located under [`examples/laravel/`](./examples/laravel):
-
-1. **[Laravel Octane with OpenSwoole](./examples/laravel/octane-openswoole)**:
+**[Laravel Octane with OpenSwoole](./examples/laravel/octane-openswoole)**:
    - High-throughput persistent worker model (5-10x throughput boost).
    - Multi-role container entrypoint (`web`, `worker`, `scheduler`).
    - Ready for Google Cloud Run, AWS ECS/Fargate, and Kubernetes.
    - Includes `docker-compose.yml` for local testing.
-
-2. **[Laravel PHP-FPM + Nginx](./examples/laravel/fpm)**:
-   - All-in-one container running Nginx and PHP-FPM managed by Supervisord.
-   - Production-hardened Nginx config with Gzip, security headers, and FastCGI buffering.
-   - Tuned `php-fpm` pool settings with access logs routed to container stdout.
-   - Includes `docker-compose.yml` for local testing.
+   - Works unchanged on `guneycan/php:8.5-swoole`: just swap the `FROM` line.
 
 ---
 
 ## Quick Start
 
-### 1. Run Laravel Octane (OpenSwoole)
+### Run Laravel Octane (OpenSwoole)
 
 ```dockerfile
 FROM guneycan/php:8.5-openswoole
@@ -96,20 +88,6 @@ EXPOSE 8080
 CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
 ```
 
-### 2. Run PHP-FPM Backend
-
-```dockerfile
-FROM guneycan/php:8.5-fpm
-
-WORKDIR /var/www/html
-
-COPY . .
-RUN composer install --no-dev --optimize-autoloader
-
-EXPOSE 9000
-CMD ["php-fpm", "-F"]
-```
-
 ---
 
 ## Local Development & Image Building
@@ -117,7 +95,7 @@ CMD ["php-fpm", "-F"]
 All images are built with `docker buildx` to ensure multi-platform compatibility and fresh base pulls:
 
 ```bash
-# Build all images (OpenSwoole, Swoole, FPM) and push
+# Build all images (OpenSwoole, Swoole) and push
 make build
 
 # Build locally without pushing (native architecture only)
@@ -126,7 +104,6 @@ make build PUSH=false
 # Build specific variants
 make openswoole
 make swoole
-make fpm
 ```
 
 ---
