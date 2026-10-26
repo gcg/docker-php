@@ -1,6 +1,6 @@
 PHP_VERSION ?= 8.5.12
 PHP_MINOR := $(word 1,$(subst ., ,$(PHP_VERSION))).$(word 2,$(subst ., ,$(PHP_VERSION)))
-SWOOLE_VERSION ?= v6.2.3
+SWOOLE_VERSION ?= v6.2.4
 PLATFORMS ?= linux/amd64,linux/arm64/v8
 IMAGE_PREFIX ?= guneycan/php
 GAR_PREFIX ?= europe-west1-docker.pkg.dev/poltio-164412/php/php

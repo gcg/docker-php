@@ -2,7 +2,7 @@ ARG PHP_VERSION=8.5.12
 FROM php:${PHP_VERSION}-cli-alpine
 LABEL maintainer="Guney Can Gokoglu (@gcg)"
 
-ARG SWOOLE_VERSION=v6.2.3
+ARG SWOOLE_VERSION=v6.2.4
 
 ## Build all extensions in one layer so the toolchain and -dev packages never ship;
 ## scanelf keeps only the shared libs the compiled extensions actually link against.
