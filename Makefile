@@ -5,8 +5,10 @@ PLATFORMS ?= linux/amd64,linux/arm64/v8
 IMAGE_PREFIX ?= guneycan/php
 GAR_PREFIX ?= europe-west1-docker.pkg.dev/poltio-164412/php/php
 PUSH ?= true
+# the default docker-driver builder can't do multi-platform; needs a docker-container builder
+BUILDER ?= builderx
 # --load can't import a multi-platform image, so local builds are native-arch only
-BUILD = docker buildx build --pull --provenance=false \
+BUILD = docker buildx build --builder $(BUILDER) --pull --provenance=false \
 	--build-arg PHP_VERSION=$(PHP_VERSION) \
 	$(if $(filter true,$(PUSH)),--push --platform $(PLATFORMS),--load)
 
