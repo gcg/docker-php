@@ -1,13 +1,13 @@
-# Production-Ready PHP 8.5 Docker Images
+# Production-Ready PHP 8.6 Docker Images
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/guneycan/php.svg?style=flat-square)](https://hub.docker.com/r/guneycan/php)
-[![PHP Version](https://img.shields.io/badge/PHP-8.5-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
-[![OpenSwoole](https://img.shields.io/badge/OpenSwoole-26.2-blue?style=flat-square)](https://openswoole.com/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.6-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![OpenSwoole](https://img.shields.io/badge/OpenSwoole-26.11-blue?style=flat-square)](https://openswoole.com/)
 [![Alpine Linux](https://img.shields.io/badge/Alpine-Linux-0D597F?style=flat-square&logo=alpinelinux&logoColor=white)](https://alpinelinux.org/)
 [![Multi-Arch](https://img.shields.io/badge/Arch-amd64%20%7C%20arm64-blue?style=flat-square)](https://hub.docker.com/r/guneycan/php/tags)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-Ultra-lean, high-performance, multi-architecture PHP 8.5 container images based on **Alpine Linux**. Designed specifically for modern cloud deployments—including **Google Cloud Run**, **AWS ECS/Fargate/EKS**, and **Kubernetes**.
+Ultra-lean, high-performance, multi-architecture PHP 8.6 container images based on **Alpine Linux**. Designed specifically for modern cloud deployments—including **Google Cloud Run**, **AWS ECS/Fargate/EKS**, and **Kubernetes**.
 
 ---
 
@@ -17,8 +17,8 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 
 | Tag | Base | Description | Best For |
 |---|---|---|---|
-| `guneycan/php:8.5-openswoole`<br>`guneycan/php:openswoole`<br>`guneycan/php:latest` | `cli-alpine` | PHP 8.5 CLI + OpenSwoole 26.2 + Redis + APCu + Composer + Tini | **Laravel Octane**, async microservices, WebSocket servers |
-| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.2 + Redis + APCu + Composer + Tini | Fallback for Octane when OpenSwoole lags behind a PHP release; Hyperf, Mezzio |
+| `guneycan/php:8.6-openswoole`<br>`guneycan/php:openswoole`<br>`guneycan/php:latest` | `cli-alpine` | PHP 8.6 CLI (ZTS) + OpenSwoole 26.11 + Redis + APCu + Composer + Tini | **Laravel Octane**, async microservices, WebSocket servers |
+| `guneycan/php:8.5-swoole`<br>`guneycan/php:swoole` | `cli-alpine` | PHP 8.5 CLI + Swoole v6.2 + Redis + APCu + Composer + Tini | Fallback for Octane; Hyperf, Mezzio *(stays on PHP 8.5 until Swoole adds PHP 8.6 support)* |
 
 ---
 
@@ -26,9 +26,10 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 
 - **Multi-Arch Native**: First-class builds for `linux/amd64` and `linux/arm64/v8`.
 - **Tini Init System**: Every image uses `tini` as `ENTRYPOINT` for proper PID 1 signal forwarding (`SIGTERM`/`SIGQUIT`) and zombie process reaping.
+- **PIE Extension Builds (PHP 8.6)**: Official `php:8.6` images dropped `pecl`; extensions are compiled via a build-time [PIE](https://github.com/php/pie) mount so neither PIE nor build toolchains ship in the final image.
 - **Compiled High-Performance Extensions**:
   - `igbinary`: High-efficiency binary serialization format.
-  - `redis`: Native PHP Redis client compiled with `enable-redis-igbinary="yes"`.
+  - `redis`: Native PHP Redis client compiled with `--enable-redis-igbinary`.
   - `apcu`: Fast in-pod shared memory cache, perfect for Prometheus metric accumulators and local caching.
   - `opcache`: Pre-installed and ready for JIT / preloading optimizations.
 - **Rich Extension Suite**: MySQL (`pdo_mysql`), PostgreSQL (`pdo_pgsql`), SQLite (`pdo_sqlite`), GD (with WebP, JPEG, FreeType), Intl, Zip, BCMath, PCNTL, Sockets, and cURL.
@@ -40,11 +41,11 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 
 | Extension | Source | Description / Optimization |
 |---|---|---|
-| `openswoole` | PECL | High-performance async coroutine runtime (in `*-openswoole`) |
-| `swoole` | Source | High-concurrency event-driven network engine (in `*-swoole`) |
-| `redis` | PECL | High-performance client compiled with `igbinary` serializer support |
-| `igbinary` | PECL | Drop-in replacement for standard PHP serializer, saving space and CPU |
-| `apcu` | PECL | In-memory key-value store across worker processes (great for Prometheus) |
+| `openswoole` | PIE | High-performance async coroutine runtime (in `*-openswoole`) |
+| `swoole` | Source | High-concurrency event-driven network engine (in `*-swoole`, PHP 8.5) |
+| `redis` | PIE | High-performance client compiled with `igbinary` serializer support |
+| `igbinary` | PIE | Drop-in replacement for standard PHP serializer, saving space and CPU |
+| `apcu` | PIE | In-memory key-value store across worker processes (great for Prometheus) |
 | `opcache` | Core | Zend OPcache bytecode optimizer (always built in since PHP 8.5) |
 | `pdo_mysql` | Core | PDO MySQL driver |
 | `pdo_pgsql` | Core | PDO PostgreSQL driver |
@@ -75,7 +76,7 @@ All images are compiled for both `linux/amd64` (Intel/AMD) and `linux/arm64/v8` 
 ### Run Laravel Octane (OpenSwoole)
 
 ```dockerfile
-FROM guneycan/php:8.5-openswoole
+FROM guneycan/php:8.6-openswoole
 
 WORKDIR /var/www/html
 
@@ -95,7 +96,7 @@ CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--p
 All images are built with `docker buildx` to ensure multi-platform compatibility and fresh base pulls:
 
 ```bash
-# Build all images (OpenSwoole, Swoole) and push
+# Build all images (OpenSwoole on PHP 8.6, Swoole on PHP 8.5) and push
 make build
 
 # Build locally without pushing (native architecture only)
@@ -110,7 +111,7 @@ make swoole
 
 ## Security & Maintenance
 
-The upstream PHP patch release is pinned via `PHP_VERSION` in the `Makefile` (and the matching `ARG` default in each Dockerfile), so builds are reproducible and never fall below a release with known CVE fixes. Bump it when a new patch lands: `make build PHP_VERSION=8.5.13`.
+The upstream PHP patch release is pinned via `PHP_VERSION` (and `SWOOLE_PHP_VERSION` for the PHP 8.5 Swoole image) in the `Makefile` and the matching `ARG` default in each Dockerfile, so builds are reproducible and never fall below a release with known CVE fixes. Bump it when a new patch lands: `make openswoole PHP_VERSION=8.6.1`.
 
 ---
 
